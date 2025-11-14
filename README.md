@@ -172,3 +172,9 @@ Run the plugin tests with:
 ```bash
 dart test
 ```
+
+---
+
+## Further reading
+
+- Official Dart docs on analyzer plugins: https://dart.dev/tools/analyzer-plugins

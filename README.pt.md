@@ -174,3 +174,9 @@ Para rodar os testes do plugin:
 ```bash
 dart test
 ```
+
+---
+
+## Referências
+
+- Documentação oficial do Dart sobre analyzer plugins: https://dart.dev/tools/analyzer-plugins
