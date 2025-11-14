@@ -1,95 +1,95 @@
 # poc_clear_double
 
-O `poc_clear_double` é um **plugin de análise (analyzer plugin) do Dart** criado como **prova de conceito (PoC)** para:
+> 🇧🇷 Quer ler em português? Confira o [`README.pt.md`](README.pt.md).
 
-- Entender o funcionamento de plugins de análise.
-- Testar como aplicar **regras de arquitetura e padronização** entre projetos.
-- Forçar o uso de uma extensão específica (`parseDouble()`) em vez de chamadas diretas a `double.parse(...)`.
+`poc_clear_double` is a **Dart analyzer plugin** created as a **proof of concept (PoC)** to:
 
----
-
-## O que é um plugin de análise (analyzer plugin)?
-
-Normalmente, o Dart/Flutter já usa o **Dart analyzer** para:
-
-- Mostrar erros e warnings no código.
-- Rodar `dart analyze` / `flutter analyze`.
-- Exibir lints no editor (VS Code, Android Studio, etc.).
-
-Um **analyzer plugin** é um pacote Dart que:
-
-- Se “pluga” no Dart analyzer.
-- Consegue **inspecionar a AST** (árvore sintática) do código.
-- Pode criar:
-  - **Regras personalizadas** (diagnósticos/lints).
-  - **Quick fixes** (correções automáticas).
-  - **Assists** (refatorações/sugestões, mesmo sem erro).
-
-Na prática: é um jeito de ensinar o analyzer a entender e reforçar **regras específicas da sua arquitetura**, do seu framework, ou do seu time.
-
-O `poc_clear_double` é uma PoC simples usando esse mecanismo, mas a ideia é que o mesmo padrão possa ser usado para regras de arquitetura em projetos reais.
+- Understand how analyzer plugins behave.
+- Try applying **architecture and consistency rules** across projects.
+- Enforce the use of a specific extension (`parseDouble()`) instead of calling `double.parse(...)` directly.
 
 ---
 
-## O que este plugin faz
+## What is an analyzer plugin?
 
-Atualmente o plugin tem:
+Out of the box, Dart/Flutter already relies on the **Dart analyzer** to:
 
-### Regra: `prefer_parse_double`
+- Show errors and warnings in your code.
+- Run `dart analyze` / `flutter analyze`.
+- Render lints inside the editor (VS Code, Android Studio, etc.).
 
-Detecta chamadas do tipo:
+An **analyzer plugin** is a Dart package that:
+
+- Plugs into the Dart analyzer.
+- Can **inspect the AST** (the code's syntax tree).
+- Is able to create:
+  - **Custom rules** (diagnostics/lints).
+  - **Quick fixes** (automatic fixes for diagnostics).
+  - **Assists** (refactorings/suggestions even when there is no error).
+
+In practice, it is a way to teach the analyzer to understand and enforce **rules that are specific to your architecture**, framework, or team.
+
+`poc_clear_double` is a simple PoC built with this mechanism, but the same pattern can be applied to real architecture rules.
+
+---
+
+## What the plugin enforces
+
+Right now the plugin ships with:
+
+### Rule: `prefer_parse_double`
+
+It detects calls such as:
 
 ```dart
 double.parse(expr);
 ```
 
-e gera um diagnóstico sugerindo trocar para:
+and emits a diagnostic suggesting:
 
 ```dart
 expr.parseDouble();
 ```
 
-A ideia é quando você tem uma **extension** (por exemplo em `String`) com `parseDouble()` e quer padronizar o uso dela ao longo do código.
+It assumes you already have an **extension** (for example, on `String`) that provides `parseDouble()` and you want to standardize its usage.
 
-> ⚠️ Este plugin **assume** que você já tem uma extensão `parseDouble()` declarada e importada no projeto. Ele apenas sugere/mecaniza a troca.
+> ⚠️ The plugin **assumes** you declared and imported a `parseDouble()` extension. It only suggests/mechanizes the replacement.
 
-### Quick fix: converter para `expr.parseDouble()`
+### Quick fix: convert to `expr.parseDouble()`
 
-Quando a regra `prefer_parse_double` é disparada, o editor oferece um *quick fix* que reescreve:
+Whenever the `prefer_parse_double` rule fires, the editor offers a *quick fix* that rewrites:
 
 ```dart
 double.parse(expr);
 ```
 
-para:
+to:
 
 ```dart
 expr.parseDouble();
 ```
 
-Em alguns casos, se necessário, o plugin adiciona parênteses para preservar precedência, por exemplo:
+When needed, the plugin adds parentheses to preserve precedence, for example:
 
 ```dart
-double.parse(a + b);   // antes
-(a + b).parseDouble(); // depois
+double.parse(a + b);   // before
+(a + b).parseDouble(); // after
 ```
 
 ---
 
-## Motivação (PoC de arquitetura)
+## Motivation (architecture PoC)
 
-Esse plugin é uma **prova de conceito** para:
+The plugin is a **proof of concept** meant to:
 
-- Ver como centralizar regras de estilo/arquitetura em um plugin só.
-- Permitir que **vários projetos** usem as mesmas regras de forma consistente.
+- See how style/architecture rules can live in a single plugin.
+- Allow **multiple projects** to reuse the same rules consistently.
 
-A ideia principal é **ajudar grandes projetos** onde existem muitos *utils* e helpers criados ao longo do tempo.  
-Por exemplo: o back-end pode exigir que uma data seja parseada de um jeito específico, e a arquitetura já definiu um util/extension que faz esse parse corretamente e mantém o padrão do código.  
-Mesmo que a pessoa desenvolvedora **não conheça esse util na hora**, no momento em que ela tentar fazer de um jeito “genérico” ou conhecido (ex.: `double.parse`, `DateTime.parse`, um helper caseiro, etc.), o plugin pode sugerir automaticamente **os padrões pré-estabelecidos pela arquitetura**, guiando o uso correto das ferramentas da base de código.
+The main idea is to **help large codebases** filled with utilities and helpers accumulated over time. For example: the back end might require parsing a date in a very specific way, and the architecture already exposes an extension that handles it correctly. Even if a developer **does not know about that helper**, as soon as they try a “generic” approach (`double.parse`, `DateTime.parse`, a homegrown helper, etc.), the plugin can suggest the **pre-approved patterns**, guiding them toward the correct tools for that codebase.
 
 ---
 
-## Estrutura do projeto
+## Project structure
 
 ```text
 poc_pattern/
@@ -101,34 +101,41 @@ poc_pattern/
       fixes.dart
     rules/
       rule.dart
+    old/
+      main.dart
+      rule.dart
+      white.dart
   test/
     poc_pattern_test.dart
   exemple/
-    (app Flutter usado para testar o plugin)
+    (Flutter app used to try out the plugin)
 ```
 
-### O que é cada arquivo/pasta
+### What each file/folder does
 
 - `exemple/`  
-  App Flutter usado como *playground* pra validar o plugin na prática.
+  Flutter app used as a playground to validate the plugin.
 
 - `lib/main.dart`  
-  Ponto de entrada do plugin. Registra a regra `PreferParseDoubleRule` e o quick fix `UseParseDoubleFix` no Dart analyzer.
+  Plugin entry point. Registers the `PreferParseDoubleRule` and the `UseParseDoubleFix` in the Dart analyzer.
 
 - `lib/rules/rule.dart`  
-  Implementa a regra em si: percorre a AST procurando chamadas `double.parse(expr)` e gera o diagnóstico `prefer_parse_double`.
+  The rule implementation. It walks the AST looking for `double.parse(expr)` calls and reports the `prefer_parse_double` diagnostic.
 
 - `lib/fixes/fixes.dart`  
-  Implementa o quick fix associado à regra, reescrevendo `double.parse(expr)` para `expr.parseDouble()`.
+  The quick fix implementation. Rewrites `double.parse(expr)` into `expr.parseDouble()`.
 
 - `test/poc_pattern_test.dart`  
-  Testes automatizados que garantem que a regra se comporta como esperado (reporta onde deve e ignora onde não deve).
+  Automated tests that make sure the rule fires where it should and stays silent elsewhere.
+
+- `lib/old/`  
+  Legacy versions of the rule/fix kept for historical reference.
 
 ---
 
-## Como usar o plugin em outro projeto
+## Using the plugin in another project
 
-No projeto (Dart/Flutter) onde você quer testar o plugin, adicione em `pubspec.yaml`:
+Inside the Dart/Flutter project where you want to try the plugin, add to `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
@@ -136,9 +143,9 @@ dev_dependencies:
     path: ../poc_pattern
 ```
 
-> Ajuste o `path` conforme a localização do plugin no seu workspace.
+> Adjust the `path` according to where the plugin lives in your workspace.
 
-Depois, no `analysis_options.yaml` do projeto:
+Then, in that project's `analysis_options.yaml`:
 
 ```yaml
 plugins:
@@ -148,19 +155,19 @@ plugins:
       prefer_parse_double: true
 ```
 
-Passos finais:
+Final steps:
 
-1. Salvar os arquivos.
-2. **Reiniciar o Dart Analysis Server** no editor.
-3. Em qualquer arquivo onde houver `double.parse(expr)`, você deverá ver:
-   - a lint `prefer_parse_double`,
-   - um quick fix para converter para `expr.parseDouble()`.
+1. Save the files.
+2. **Restart the Dart Analysis Server** in your editor.
+3. In any file containing `double.parse(expr)` you'll now see:
+   - the `prefer_parse_double` lint, and
+   - a quick fix that converts it to `expr.parseDouble()`.
 
 ---
 
-## Desenvolvimento / Testes
+## Development / tests
 
-Para rodar os testes do plugin:
+Run the plugin tests with:
 
 ```bash
 dart test
