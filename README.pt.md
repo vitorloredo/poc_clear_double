@@ -103,10 +103,6 @@ poc_pattern/
       fixes.dart
     rules/
       rule.dart
-    old/
-      main.dart
-      rule.dart
-      white.dart
   test/
     poc_pattern_test.dart
   exemple/
@@ -130,8 +126,6 @@ poc_pattern/
 - `test/poc_pattern_test.dart`  
   Testes automatizados que garantem que a regra se comporta como esperado (reporta onde deve e ignora onde não deve).
 
-- `lib/old/`  
-  Implementações antigas da regra/fix que ficaram como referência histórica.
 
 ---
 
