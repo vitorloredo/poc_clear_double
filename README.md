@@ -101,10 +101,6 @@ poc_pattern/
       fixes.dart
     rules/
       rule.dart
-    old/
-      main.dart
-      rule.dart
-      white.dart
   test/
     poc_pattern_test.dart
   exemple/
@@ -127,9 +123,6 @@ poc_pattern/
 
 - `test/poc_pattern_test.dart`  
   Automated tests that make sure the rule fires where it should and stays silent elsewhere.
-
-- `lib/old/`  
-  Legacy versions of the rule/fix kept for historical reference.
 
 ---
 
