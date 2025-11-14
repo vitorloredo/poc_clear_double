@@ -2,7 +2,6 @@ name: poc_pattern
 description: A starting point for Dart libraries or applications.
 version: 1.0.0
 publish_to: "none"
-# repository: https://github.com/my_org/my_repo
 
 environment:
   sdk: ^3.10.0
@@ -12,7 +11,6 @@ dependencies:
   analysis_server_plugin: any
   analyzer: any
   analyzer_plugin: any
-  # path: ^1.9.0
 
 dev_dependencies:
   analyzer_testing: any
